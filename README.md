@@ -1,31 +1,28 @@
-```puml
-@startuml
+```mermaid
 
-!theme plain
-top to bottom direction
-skinparam linetype ortho
-
+classDiagram
+direction BT
 class session {
-   id_user: text
-   dtime_session: timestamp
-   id_session: text
+   text id_user
+   timestamp dtime_session
+   text id_session
 }
 class user {
-   txt_username: text
-   hash_pass: text
-   dt_registration: date
-   txt_email: text
-   id_user: text
+   text txt_username
+   text hash_pass
+   date dt_registration
+   text txt_email
+   text id_user
 }
 class video {
-   id_video: text
-   id_session: text
-   dtime_upload: timestamp
-   num_metric_like: numeric
-   num_metric_dislike: numeric
+   text id_video
+   text id_session
+   timestamp dtime_upload
+   numeric num_metric_like
+   numeric num_metric_dislike
 }
 
-session  -[#595959,plain]-^  user    : "id_user"
-video    -[#595959,plain]-^  session : "id_session"
-@enduml
+session  -->  user : id_user
+video  -->  session : id_session
+
 ```
