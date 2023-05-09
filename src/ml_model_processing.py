@@ -212,7 +212,6 @@ class TikTokAnalytics(torch.nn.Module):
         # Make base predictions using trained model and get base like value
         base_predict: torch.Tensor = self.predict_model(tensor)
         base_predict = base_predict.detach()
-        base_like_value = base_predict[0, 1].item()
 
         # Compute channel impact on model's decision
         channel_impact = []
@@ -312,7 +311,7 @@ class TikTokAnalytics(torch.nn.Module):
                                  for i in range(5)
                                  ], dim=1)
 
-        fig_worst_frame, ax_worst_frame = plt.subplots(figsize=(15, 15))
+        fig_worst_frame, ax_worst_frame = plt.subplots(figsize=(20, 20))
         for ind_frame in range(min(num_frames, 20)):
             (x, y) = (50 + 512 * (ind_frame // 5), 50 + 512 * (ind_frame % 5))
             ax_worst_frame.text(y, x, f'f:{ind_max_frame_impact + 1}', color='black',
@@ -322,8 +321,7 @@ class TikTokAnalytics(torch.nn.Module):
         ax_worst_frame.set_axis_off()
 
         fig_grid, ax_grid = plt.subplots(figsize=(15, 15))
-        masked_images = self.max_pool_adapt(masked_images)
-        ax_grid.imshow(masked_images)
+        ax_grid.imshow(self.max_pool_adapt(masked_images))
         ax_grid.set_axis_off()
 
         with torch.no_grad():
@@ -390,12 +388,12 @@ class TikTokAnalytics(torch.nn.Module):
         return torch.nn.functional.max_pool2d(t.permute(2, 0, 1), (k, k)).permute(1, 2, 0)
 
 
-if __name__ == '__main__':
-    import os
-
-    os.chdir('..')
-    # video_path = '/Users/victorbarbarich/Downloads/video-ds-shock.mp4'
-    video_path = '/Users/victorbarbarich/Downloads/IMG_3592.MOV'
-
-    app = TikTokAnalytics()
-    out = app.advanced_forward(video_path)
+# if __name__ == '__main__':
+#     import os
+#
+#     os.chdir('..')
+#     # video_path = '/Users/victorbarbarich/Downloads/video-ds-shock.mp4'
+#     video_path = '/Users/victorbarbarich/Downloads/IMG_3592.MOV'
+#
+#     app = TikTokAnalytics()
+#     out = app.advanced_forward(video_path)
