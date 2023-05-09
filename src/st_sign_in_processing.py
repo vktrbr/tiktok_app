@@ -79,7 +79,7 @@ class SignInForm(SingInStates):
             center: st.delta_generator.DeltaGenerator
 
             with center.form('Sign in form'):
-                self.__username = st.text_input(label='Username or email address')
+                self.__username = st.text_input(label='Username')
                 self.__password_hash = sha256(
                     st.text_input(label='Password', type='password').encode('utf-8')).hexdigest()
 

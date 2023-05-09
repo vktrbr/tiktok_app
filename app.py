@@ -17,6 +17,10 @@ class AppMainBody:
         self._evaluate_process = VideoProcessing(self.__pgc)
         self._main_page_process = MainPage()
 
+        self._low_attention = -2
+        self._high_attention = 2
+        self._rgw = (0.4, 0.4, 0.25)
+
         st.session_state['signed_in']: str = SignInForm.INIT
         st.session_state['signed_up']: str = 'default'
         st.session_state['video_eval']: str = VideoProcessing.DEFAULT
@@ -40,13 +44,13 @@ class AppMainBody:
             self.__pgc.log_new_session()
             st.session_state['signed_in'] = SignInForm.SIGNED_IN
 
-    def conduct_process_video_evaluating(self):
+    def conduct_process_video_evaluating(self, **kwargs):
 
         if self._main_page_process.state in (MainPage.SINGED,):
             self._evaluate_process.video_input_form()
 
         if self._evaluate_process.state in (VideoProcessing.VIDEO_UPLOADED,):
-            self._evaluate_process.evaluate_form()
+            self._evaluate_process.evaluate_form(**kwargs)
 
     def conduct_process_signing_up(self):
 
@@ -74,7 +78,18 @@ class AppMainBody:
                 self.conduct_process_signing_up()
 
         elif self._main_page_process.state in (MainPage.SINGED,) and self.__pgc.user_id_session is not None:
-            self.conduct_process_video_evaluating()
+
+            with st.sidebar:
+                self._low_attention = st.slider('low attention', -10.0, 0.0, -2.0)
+                self._high_attention = st.slider('high attention', 0.0, 10.0, 2.0)
+                r = st.slider('red threshold', 0.0, 1.0, 0.25)
+                g = st.slider('green threshold', 0.0, 1.0, 0.25)
+                w = st.slider('white threshold', 0.0, 1.0, 0.25)
+                self._rgw = (r, g, w)
+
+            self.conduct_process_video_evaluating(low_attention=self._low_attention,
+                                                  high_attention=self._high_attention,
+                                                  rgw_thr=self._rgw)
 
         elif self._main_page_process.state not in (MainPage.INIT, MainPage.SINGED):
 
@@ -85,7 +100,6 @@ class AppMainBody:
 
             elif self._main_page_process.state in (MainPage.SING_UP_CLICK,):
                 self.conduct_process_signing_up()
-
 
     def get_main_page_state(self):
         return self._main_page_process.state

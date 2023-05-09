@@ -45,6 +45,7 @@ class MainPage:
 
         return self.__main_page_state
 
+
     def clear_main_page(self):
         self._main_container.empty()
         del self._main_container

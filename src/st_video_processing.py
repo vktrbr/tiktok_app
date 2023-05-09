@@ -1,5 +1,6 @@
-import numpy as np
+import subprocess
 import plotly.graph_objs as go
+import streamlit as st
 from PIL import Image
 from streamlit.delta_generator import DeltaGenerator
 
@@ -48,7 +49,7 @@ class VideoProcessing:
 
             with self._input_form_container.form('Upload video'):
                 # Allow users to upload a video file
-                self.__video_file = st.file_uploader("Upload your video ", type=["mp4", 'mov'])
+                self.__video_file = st.file_uploader("Upload your video ", type=["mp4", "mov"])
 
                 # Create a button for uploading the file
                 click_upload_button = st.form_submit_button('Upload', use_container_width=True)
@@ -64,17 +65,32 @@ class VideoProcessing:
                 st.stop()
 
             if click_upload_button and self.__video_file is not None:
+                extension = self.__video_file.name[-3:]
                 # Generate a unique filename for the uploaded video file
-                self.__video_path = os.getenv('VIDEO_DIR') + f'/{hash(str(self.__video_file)) % 10 ** 10}.mp4'
+                self.__video_path = os.getenv('VIDEO_DIR') + f'/{hash(str(self.__video_file)) % 10 ** 10}.{extension}'
 
                 # Save the video file to the local directory
                 with open(self.__video_path, 'wb') as file:
                     file.write(self.__video_file.read())
 
+                if self.__video_file.name.split('.')[-1].lower() == 'mov':
+                    mov_path = self.__video_path
+                    self.__video_path = self.__video_path[:-3] + 'mp4'
+                    file = open(self.__video_path, 'wb')
+                    file.close()
+                    subprocess.call(['ffmpeg', '-loglevel', 'fatal', '-y', '-i', mov_path, self.__video_path])
+                    os.remove(mov_path)
+
                 # Update the state of the object
                 self.state = self.VIDEO_UPLOADED
 
-    def evaluate_form(self):
+    def evaluate_form(self, **kwargs):
+        if 'low_attention' in kwargs:
+            self.__predict_model.low_attention = kwargs['low_attention']
+        if 'high_attention' in kwargs:
+            self.__predict_model.high_attention = kwargs['high_attention']
+        if 'rgw' in kwargs:
+            self.__predict_model.rgw_thr = kwargs['rgw']
 
         _, self._message_container, _ = st.columns([1, 5, 1], gap='medium')
         self._video_container: DeltaGenerator
@@ -85,11 +101,27 @@ class VideoProcessing:
 
         with self._message_container.container():
             with st.spinner():
-                predict_out = self.__predict_model(self.__video_path)[0]
+                predict_out = self.__predict_model.advanced_forward(self.__video_path)
+            if predict_out is None:
+                st.stop()
+            else:
                 self.delete_video_file()
 
-            chart_gauge, like_value = self.gen_chart_gauge(float(predict_out[0]), float(predict_out[1]))
-            st.plotly_chart(chart_gauge, use_container_width=True)
+            st.write('**Chance of success:**')
+            chart_gauge, like_value = self.gen_chart_gauge(*list(predict_out['base_predict']['sm']))
+            row_col, gauge_col = st.columns((1, 10))
+            gauge_col.plotly_chart(chart_gauge, use_container_width=True)
+
+            st.write('**What we noticed in your video** (green - like, red - dislike, white - neutral attention):')
+            st.pyplot(predict_out['pretty_filters']['fig'], use_container_width=True)
+
+            st.write('**Perhaps it would be better without this frame:**')
+            st.pyplot(predict_out['worst_frame']['fig'], use_container_width=True)
+
+            st.write('**Full like-dislike grid:**')
+            st.pyplot(predict_out['grid']['fig'], use_container_width=True)
+
+            st.write(predict_out)
 
         self.__pgc.log_video_values(self.__video_file.name, like_value)
         self.state = self.VIDEO_EVALUATED
@@ -156,20 +188,22 @@ class VideoProcessing:
     def gen_chart_gauge(dislike_value: float = 2, like_value: float = 1) -> tuple[go.Figure, float]:
 
         # normalize to [0, 1]
-        dislike_value, like_value = 1 / (1 + np.exp((dislike_value, like_value)))
+        if not (dislike_value > 0 and like_value > 0 and abs(dislike_value + like_value - 1) < 1e-6):
+            dislike_value, like_value = 1 / (1 + np.exp((dislike_value, like_value)))
+
         dislike_value, like_value = np.array((dislike_value, like_value)) / (dislike_value + like_value)
+        dislike_value = float(dislike_value)
+        like_value = float(like_value)
 
-        current_color = {0 < like_value * 100 <= 50: '#ffb5a7',
-                         50 < like_value * 100 <= 100: '#52b69a'}[True]
+        current_color = '#ffb5a7' if like_value * 100 <= 50 else '#52b69a'
 
-        current_color_sub = {0 < like_value * 100 <= 50: '#fcd5ce',
-                             50 < like_value * 100 <= 100: '#a5d2c3'}[True]
+        current_color_sub = '#fcd5ce' if like_value * 100 <= 50 else '#a5d2c3'
 
         chart_gauge = go.Figure(go.Indicator(
             mode="gauge+number",
             value=like_value * 100,
             domain={'x': [0, 1], 'y': [0, 1]},
-            title={'text': "Probability of success", 'font': {'size': 24}},
+            # title={'text': "Probability of success", 'font': {'size': 24}},
             delta={'reference': dislike_value * 100, 'increasing': {'color': current_color_sub},
                    'decreasing': {'color': current_color_sub}},
             gauge={
