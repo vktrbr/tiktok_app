@@ -294,7 +294,7 @@ class TikTokAnalytics(torch.nn.Module):
                                     512 * 5 * i: 512 * 5 * (i + 1)]
                                     for i in range(masked_images.shape[1] // 2560)])
 
-        fig_pretty_filters, ax_pretty_filters = plt.subplots(figsize=(25, 30))
+        fig_pretty_filters, ax_pretty_filters = plt.subplots(figsize=(15, 15))
         for ind_frame in range(min(num_frames, 20)):
             (x, y) = (50 + 512 * (ind_frame // 5), 50 + 512 * (ind_frame % 5))
             ax_pretty_filters.text(y, x, f'f:{ind_frame + 1}', color='black',
@@ -312,7 +312,7 @@ class TikTokAnalytics(torch.nn.Module):
                                  for i in range(5)
                                  ], dim=1)
 
-        fig_worst_frame, ax_worst_frame = plt.subplots(figsize=(25, 25))
+        fig_worst_frame, ax_worst_frame = plt.subplots(figsize=(15, 15))
         for ind_frame in range(min(num_frames, 20)):
             (x, y) = (50 + 512 * (ind_frame // 5), 50 + 512 * (ind_frame % 5))
             ax_worst_frame.text(y, x, f'f:{ind_max_frame_impact + 1}', color='black',
@@ -321,7 +321,7 @@ class TikTokAnalytics(torch.nn.Module):
         ax_worst_frame.imshow(self.max_pool_adapt(worst_frame))
         ax_worst_frame.set_axis_off()
 
-        fig_grid, ax_grid = plt.subplots(figsize=(25, 25))
+        fig_grid, ax_grid = plt.subplots(figsize=(15, 15))
         masked_images = self.max_pool_adapt(masked_images)
         ax_grid.imshow(masked_images)
         ax_grid.set_axis_off()
@@ -380,7 +380,7 @@ class TikTokAnalytics(torch.nn.Module):
         return np.clip(1 + t / 1.5, 0, 2)
 
     @staticmethod
-    def max_pool_adapt(t: torch.Tensor, k: int = 4) -> torch.Tensor:
+    def max_pool_adapt(t: torch.Tensor, k: int = 3) -> torch.Tensor:
         """
         tensor size: (H:W:C)
         :param t:
