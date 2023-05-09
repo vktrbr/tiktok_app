@@ -17,7 +17,7 @@ class PreprocessModel(torch.nn.Module):
 
     FPS_DIV = 30
     MAX_LENGTH = 90
-    BATCH_SIZE = 4
+    BATCH_SIZE = 1
     MAX_TIME = 20.0
     MODEL_PATH = os.getenv('MODEL_PATH')
 
@@ -258,8 +258,6 @@ class TikTokAnalytics(torch.nn.Module):
 
         cell_attention_value = (cell_attention_value * 100 - 100).round()
         cell_attention_value = -(cell_attention_value - torch.median(cell_attention_value.flatten()))
-        import streamlit as st
-        st.write(self.high_attention)
 
         for fr_idx in range(num_frames):
             for ch_idx in range(num_channels):
