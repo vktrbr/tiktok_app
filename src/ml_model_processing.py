@@ -300,7 +300,7 @@ class TikTokAnalytics(torch.nn.Module):
                                    bbox={'facecolor': 'white', 'edgecolor': 'none',
                                          'boxstyle': 'round'})
 
-        ax_pretty_filters.imshow(self.max_pool_adapt(pretty_filters))
+        ax_pretty_filters.imshow(pretty_filters)
         ax_pretty_filters.set_axis_off()
 
         first_20_channels = 20  # This is workaround
@@ -317,7 +317,7 @@ class TikTokAnalytics(torch.nn.Module):
             ax_worst_frame.text(y, x, f'f:{ind_max_frame_impact + 1}', color='black',
                                 bbox={'facecolor': 'white', 'edgecolor': 'none', 'boxstyle': 'round'})
 
-        ax_worst_frame.imshow(self.max_pool_adapt(worst_frame))
+        ax_worst_frame.imshow(worst_frame)
         ax_worst_frame.set_axis_off()
 
         fig_grid, ax_grid = plt.subplots(figsize=(15, 15))
@@ -378,7 +378,7 @@ class TikTokAnalytics(torch.nn.Module):
         return np.clip(1 + t / 1.5, 0, 2)
 
     @staticmethod
-    def max_pool_adapt(t: torch.Tensor, k: int = 3) -> torch.Tensor:
+    def max_pool_adapt(t: torch.Tensor, k: int = 4) -> torch.Tensor:
         """
         tensor size: (H:W:C)
         :param t:
