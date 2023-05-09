@@ -376,7 +376,7 @@ class TikTokAnalytics(torch.nn.Module):
         t = torch.clip(t, threshold, 1)
         t[t == threshold] = 0
 
-        return 1 + t / 3
+        return np.clip(1 + t / 1.5, 0, 2)
 
 
 if __name__ == '__main__':

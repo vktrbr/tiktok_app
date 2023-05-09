@@ -1,7 +1,10 @@
+from src.os_limit_usage import *
 from src.st_main_page import *
 from src.st_sign_in_processing import *
 from src.st_sign_up_precessing import *
 from src.st_video_processing import *
+
+set_max_memory()
 
 dotenv.load_dotenv()
 
@@ -80,11 +83,11 @@ class AppMainBody:
         elif self._main_page_process.state in (MainPage.SINGED,) and self.__pgc.user_id_session is not None:
 
             with st.sidebar:
-                self._low_attention = st.slider('low attention', -10.0, 0.0, -2.0)
-                self._high_attention = st.slider('high attention', 0.0, 10.0, 2.0)
-                r = st.slider('red threshold', 0.0, 1.0, 0.25)
-                g = st.slider('green threshold', 0.0, 1.0, 0.25)
-                w = st.slider('white threshold', 0.0, 1.0, 0.25)
+                self._low_attention = st.slider('low attention', -10.0, 0.0, -1.0)
+                self._high_attention = st.slider('high attention', 0.0, 10.0, 1.0)
+                r = st.slider('red threshold', 0.0, 1.0, 0.1)
+                g = st.slider('green threshold', 0.0, 1.0, 0.1)
+                w = st.slider('white threshold', 0.0, 1.0, 0.1)
                 self._rgw = (r, g, w)
 
             self.conduct_process_video_evaluating(low_attention=self._low_attention,
