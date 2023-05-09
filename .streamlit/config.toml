@@ -1,2 +1,13 @@
 [theme]
 base = "light"
+
+
+[server]
+port = ""
+baseUrlPath = "tiktok_app"
+
+
+[browser]
+serverAddress = "tiktok-app.1311542-cu35197.tw1.ru"
+
+
