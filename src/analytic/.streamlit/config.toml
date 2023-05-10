@@ -1,0 +1,6 @@
+[server]
+port = 80
+baseUrlPath = "tiktok_app_analytic"
+
+[browser]
+serverAddress = "tiktok-app.vktrbr.tw1.ru"
