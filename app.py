@@ -1,13 +1,13 @@
 from src.os_limit_usage import *
 from src.st_main_page import *
+from src.st_page_config import *
 from src.st_sign_in_processing import *
 from src.st_sign_up_precessing import *
 from src.st_video_processing import *
 
 set_max_memory()
-
 dotenv.load_dotenv()
-
+set_page_config()
 os.chdir(os.getenv('MAIN_PATH'))
 
 
