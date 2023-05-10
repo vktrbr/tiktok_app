@@ -13,6 +13,8 @@ st.set_page_config(layout='wide', page_title='kpi tiktok forecast')
 
 st.title('TikTok Forecast App Analytics')
 
+st.write('\n')
+
 if 'connect' not in st.session_state:
     st.session_state['pg'] = PGConnection()
 
