@@ -10,7 +10,7 @@ from db_connect import PGConnection
 
 st.set_page_config(layout='wide', page_title='kpi tiktok forecast')
 
-st.title('TikTok Forecast App Analytics')
+st.title('TikTokForecast App Analytics')
 
 st.write('\n\n')
 
