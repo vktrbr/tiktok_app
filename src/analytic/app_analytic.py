@@ -1,10 +1,13 @@
+import sys
 from time import sleep
 
 import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from ..db_connect import PGConnection
+sys.path.insert(0, '..')
+
+from db_connect import PGConnection
 
 st.set_page_config(layout='wide', page_title='kpi tiktok forecast')
 
@@ -87,4 +90,4 @@ charts[1].plotly_chart(px.line(df_video_scoring_time, x="Scoring Date", y="Avg s
 
 st.session_state['pg'].close()
 
-sleep(3)
+sleep(300)
