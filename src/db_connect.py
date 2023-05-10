@@ -55,6 +55,14 @@ class PGConnection:
         record = self.__cursor.fetchone()
         return record
 
+    def select(self, query: str):
+
+        self.open()
+        self.__cursor.execute(query)
+        record = self.__cursor.fetchall()
+        self.close()
+        return record
+
     def close(self):
         self.__cursor.close()
         self.__conn.close()
@@ -276,3 +284,7 @@ class PGConnection:
     @property
     def user_id_session(self):
         return self.__user_id_session
+
+    @property
+    def connection(self):
+        return self.__conn
