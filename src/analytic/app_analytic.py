@@ -1,5 +1,4 @@
 import sys
-from time import sleep
 
 import pandas as pd
 import plotly.express as px
@@ -13,7 +12,7 @@ st.set_page_config(layout='wide', page_title='kpi tiktok forecast')
 
 st.title('TikTok Forecast App Analytics')
 
-st.write('\n')
+st.write('\n\n')
 
 if 'connect' not in st.session_state:
     st.session_state['pg'] = PGConnection()
@@ -91,5 +90,3 @@ charts[1].plotly_chart(px.line(df_video_scoring_time, x="Scoring Date", y="Avg s
                        use_container_width=True)
 
 st.session_state['pg'].close()
-
-sleep(300)
